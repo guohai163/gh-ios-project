@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreLocation
+import SwiftyJSON
 
 class ViewController: UIViewController,CLLocationManagerDelegate {
     
@@ -53,6 +54,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         label2.text = "速度：\(currLocation.speed)m/s  \(currLocation.speed*60*60/1000)km/h"
         coorlati.text = "纬度：\(currLocation.coordinate.latitude)"
         coorlong.text = "经度：\(currLocation.coordinate.longitude)"
+
         getCityFromGpsLocation(longitude: Float(currLocation.coordinate.longitude), latitude: Float(currLocation.coordinate.latitude))
         if progress.text == "-"{
             progress.text  = "|"
@@ -62,13 +64,43 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         }
     }
     
+    
     //通过坐标返回城市信息
     func getCityFromGpsLocation(longitude:Float,latitude:Float) -> String{
         var city = ""
         if longitude != lastLongitude || latitude != lastLatitude {
-            
-            let url = "http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location=\(latitude),\(longitude)&output=json&pois=1&ak=g5sZlysC3gbXAQOnrnCyEX12FT9iSz5G"
-            print(url)
+            let baiduApi = "https://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location=\(latitude),\(longitude)&output=json&pois=1&ak=g5sZlysC3gbXAQOnrnCyEX12FT9iSz5G"
+            print(baiduApi)
+            let url = URL(string:baiduApi)
+            URLSession.shared.dataTask(with: url!, completionHandler: {
+                (data, response, error) in
+                if error != nil {
+                    print("get city error")
+                }
+                else{
+                    //print (data?.base64EncodedString() as Any)
+                    let jsonString:String = String(data:data!,encoding:String.Encoding.utf8)!
+                    print(jsonString)
+                    if let httpResponse = response as? HTTPURLResponse {
+                        print("Http status code: \(httpResponse.statusCode)  \(httpResponse.mimeType)")
+                    }
+                    
+                    if let dataFromString = jsonString.data(using: String.Encoding.utf8, allowLossyConversion: false) {
+                        let json = JSON(data: dataFromString)
+                        print(json)
+                    }
+                    
+                    
+                    do{
+                    let json = try JSONSerialization.jsonObject(with: data!, options:.allowFragments) as! [String : AnyObject]
+                    
+                    print (json)
+                    }catch let error as NSError{
+                        print (error)
+                    }
+                }
+                
+                }).resume()
             
             
             //将本次变更存储起来
