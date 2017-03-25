@@ -8,7 +8,6 @@
 
 import UIKit
 import CoreLocation
-import SwiftyJSON
 
 class ViewController: UIViewController,CLLocationManagerDelegate {
     
@@ -79,16 +78,15 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
                 }
                 else{
                     //print (data?.base64EncodedString() as Any)
-                    let jsonString:String = String(data:data!,encoding:String.Encoding.utf8)!
-                    print(jsonString)
+                    //let jsonString:String = String(data:data!,encoding:String.Encoding.utf8)!
                     if let httpResponse = response as? HTTPURLResponse {
                         print("Http status code: \(httpResponse.statusCode)  \(httpResponse.mimeType)")
                     }
                     
-                    if let dataFromString = jsonString.data(using: String.Encoding.utf8, allowLossyConversion: false) {
-                        let json = JSON(data: dataFromString)
-                        print(json)
-                    }
+//                    if let dataFromString = jsonString.data(using: String.Encoding.utf8, allowLossyConversion: false) {
+//                 
+//                        print(json)
+//                    }
                     
                     
                     do{
